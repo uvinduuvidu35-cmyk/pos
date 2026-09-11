@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -186,6 +185,14 @@
             background-color: #2d313e;
         }
 
+        /* Error Message Style */
+        .error-msg {
+            color: #ff4d4d;
+            font-size: 12px;
+            text-align: center;
+            margin-top: 10px;
+        }
+
         /* Sliding Overlay Container */
         .toggle-container {
             position: absolute;
@@ -204,7 +211,6 @@
             border-radius: 0 150px 100px 0;
         }
 
-        /* Gradient එක ලා තැඹිලි සහ තද රතු ලෙස වෙනස් කර ඇත */
         .toggle {
             background: linear-gradient(135deg, #ff7d32 0%, #4a0000 100%);
             height: 100%;
@@ -280,7 +286,6 @@
             color: #4a0000;
         }
 
-        /* Developed by කොටස සඳහා CSS */
         .developer-tag {
             position: absolute;
             bottom: 20px;
@@ -326,20 +331,21 @@
         <!-- Sign In (Login) Form -->
         <div class="form-container login-container">
             <h2>Login</h2>
-            <form action="#">
+            <form id="loginForm">
                 <div class="input-group">
                     <label>Username</label>
-                    <input type="text" placeholder="Enter your username" required>
+                    <input type="text" id="loginUsername" placeholder="Enter your username" required>
                 </div>
                 <div class="input-group">
                     <label>Password</label>
-                    <input type="password" placeholder="Enter your password" required>
+                    <input type="password" id="loginPassword" placeholder="Enter your password" required>
                 </div>
                 <div class="options-row">
                     <label><input type="checkbox"> Remember me</label>
                     <a href="#">Forgot password?</a>
                 </div>
                 <button type="submit" class="btn-submit">Sign In</button>
+                <p id="errorMsg" class="error-msg"></p>
                 <div class="divider">or login with social platforms</div>
                 <div class="social-buttons">
                     <button type="button" class="btn-social">
@@ -359,13 +365,13 @@
                     <h1>Welcome Back!</h1>
                     <p>Enter your details to use all of system features</p>
                     <button class="btn-outline" id="login">Sign In</button>
-                    <div class="developer-tag">Developed by m4k</div>
+                    <div class="developer-tag">Developed by 2m4k</div>
                 </div>
                 <div class="toggle-panel toggle-right">
                     <h1>Hello, Welcome</h1>
                     <p>Don't have an account?</p>
                     <button class="btn-outline" id="register">Register</button>
-                    <div class="developer-tag">Developed by to  m4k</div>
+                    <div class="developer-tag">Developed by m4k</div>
                 </div>
             </div>
         </div>
@@ -375,6 +381,7 @@
         const container = document.getElementById('container');
         const registerBtn = document.getElementById('register');
         const loginBtn = document.getElementById('login');
+        const loginForm = document.getElementById('loginForm');
 
         registerBtn.addEventListener('click', () => {
             container.classList.add("active");
@@ -382,6 +389,25 @@
 
         loginBtn.addEventListener('click', () => {
             container.classList.remove("active");
+        });
+
+        // Login Submit Handling
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const usernameInput = document.getElementById('loginUsername').value;
+            const passwordInput = document.getElementById('loginPassword').value;
+            const errorMsg = document.getElementById('errorMsg');
+
+            // Set your default Username and Password here
+            const validUsername = "admin";
+            const validPassword = "123";
+
+            if (usernameInput === validUsername && passwordInput === validPassword) {
+                window.location.href = "dashboard.html";
+            } else {
+                errorMsg.innerText = "Invalid Username or Password!";
+            }
         });
     </script>
 
