@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DCK POS - Charts & Analytics</title>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', Arial, sans-serif;
+        }
+
+        body { 
+            display: flex; 
+            background-color: #f4f6f9; 
+            color: #333;
+        }
+
+        /* Sidebar Styling */
+        .sidebar { 
+            width: 260px; 
+            background-color: #1a1c23; 
+            color: white; 
+            height: 100vh; 
+            padding: 20px 15px; 
+            position: fixed; 
+            overflow-y: auto;
+        }
+
+        .sidebar h2 { 
+            text-align: center; 
+            color: #ffffff; 
+            margin-bottom: 30px; 
+            font-size: 22px;
+            letter-spacing: 1px;
+        }
+
+        .sidebar ul { 
+            list-style: none; 
+            padding: 0; 
+        }
+
+        .sidebar li { 
+            margin: 8px 0; 
+        }
+
+        .sidebar a { 
+            color: #a0a5b5; 
+            text-decoration: none; 
+            display: flex; 
+            align-items: center; 
+            gap: 12px;
+            padding: 12px 15px; 
+            border-radius: 8px; 
+            font-size: 14px;
+            transition: all 0.3s ease; 
+        }
+
+        .sidebar a i {
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar a:hover, .sidebar a.active { 
+            background: linear-gradient(90deg, #ff7d32, #4a0000); 
+            color: white; 
+        }
+
+        /* Main Content */
+        .main-content { 
+            margin-left: 260px; 
+            padding: 25px; 
+            width: calc(100% - 260px); 
+        }
+
+        header { 
+            background-color: white; 
+            padding: 15px 25px; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 25px;
+        }
+
+        header h1 {
+            font-size: 24px;
+            color: #1a1c23;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+        }
+
+        .user-profile i {
+            font-size: 20px;
+            color: #ff7d32;
+        }
+
+        /* Charts Grid Section */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+        }
+
+        .chart-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .chart-card h3 {
+            font-size: 16px;
+            color: #1a1c23;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+        }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 220px;
+        }
+
+        canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2>DCK POS</h2>
+        <ul>
+            <li><a href="index.html"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
+            <li><a href="#"><i class="fa-solid fa-cart-shopping"></i> POS</a></li>
+            <li><a href="#"><i class="fa-solid fa-boxes-stacked"></i> Items</a></li>
+            <li><a href="#"><i class="fa-solid fa-users"></i> Customers</a></li>
+            <li><a href="#"><i class="fa-solid fa-clock-rotate-left"></i> Shifts</a></li>
+            <li><a href="#"><i class="fa-solid fa-wallet"></i> Expenses</a></li>
+            <li><a href="#"><i class="fa-solid fa-money-bill-transfer"></i> Cash Drops</a></li>
+            <li><a href="#"><i class="fa-solid fa-cubes"></i> Stock</a></li>
+            <li><a href="#"><i class="fa-solid fa-sliders"></i> Adjustments</a></li>
+            <li><a href="#"><i class="fa-solid fa-arrow-right-arrow-left"></i> Transfers</a></li>
+            <li><a href="#"><i class="fa-solid fa-file-invoice"></i> Reports</a></li>
+            <li><a href="charts.html" class="active"><i class="fa-solid fa-chart-pie"></i> Charts</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <header>
+            <h1>Analytics & Charts</h1>
+            <div class="user-profile">
+                <i class="fa-solid fa-circle-user"></i> User: Admin
+            </div>
+        </header>
+
+        <!-- Charts Grid Layout -->
+        <div class="charts-grid">
+            <!-- Pie Chart: Stock Breakdown -->
+            <div class="chart-card">
+                <h3><i class="fa-solid fa-chart-pie" style="color: #ff7d32;"></i> Stock Category Breakdown</h3>
+                <div class="chart-container">
+                    <canvas id="shoeCategoryChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Line Chart: Daily Revenue -->
+            <div class="chart-card">
+                <h3><i class="fa-solid fa-chart-line" style="color: #ff7d32;"></i> Daily Revenue (LKR)</h3>
+                <div class="chart-container">
+                    <canvas id="dailySalesChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Line Chart: Monthly Revenue -->
+            <div class="chart-card">
+                <h3><i class="fa-solid fa-chart-simple" style="color: #2ecc71;"></i> Monthly Revenue (LKR)</h3>
+                <div class="chart-container">
+                    <canvas id="monthlySalesChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Line Chart: Yearly Revenue -->
+            <div class="chart-card">
+                <h3><i class="fa-solid fa-arrow-trend-up" style="color: #9b59b6;"></i> Yearly Revenue (LKR)</h3>
+                <div class="chart-container">
+                    <canvas id="yearlySalesChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const lkrFormatter = new Intl.NumberFormat('en-LK', {
+            style: 'currency',
+            currency: 'LKR',
+        });
+
+        // 1. Pie Chart: Stock Categories
+        new Chart(document.getElementById('shoeCategoryChart').getContext('2d'), {
+            type: 'pie',
+            data: {
+                labels: ['Gents', 'Ladies', 'Girls', 'Boys', 'Kids'],
+                datasets: [{
+                    data: [140, 180, 90, 110, 60],
+                    backgroundColor: ['#1a1c23', '#ff7d32', '#4a0000', '#3498db', '#2ecc71'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { boxWidth: 12, font: { size: 11 } }
+                    }
+                }
+            }
+        });
+
+        // 2. Daily Sales Chart (Min: 2,000 | Max: 20,000)
+        new Chart(document.getElementById('dailySalesChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Daily Revenue',
+                    data: [3000, 6500, 8000, 12000, 15500, 19500, 14000],
+                    borderColor: '#ff7d32',
+                    backgroundColor: 'rgba(255, 125, 50, 0.15)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: { label: (ctx) => lkrFormatter.format(ctx.parsed.y) }
+                    }
+                },
+                scales: {
+                    y: {
+                        min: 2000,
+                        max: 20000,
+                        ticks: {
+                            callback: (value) => 'Rs. ' + value.toLocaleString(),
+                            font: { size: 10 }
+                        }
+                    },
+                    x: { ticks: { font: { size: 10 } } }
+                }
+            }
+        });
+
+        // 3. Monthly Sales Chart (Step size: 5,000)
+        new Chart(document.getElementById('monthlySalesChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                datasets: [{
+                    label: 'Monthly Revenue',
+                    data: [10000, 20000, 15000, 35000, 25000, 45000],
+                    borderColor: '#2ecc71',
+                    backgroundColor: 'rgba(46, 204, 113, 0.15)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: { label: (ctx) => lkrFormatter.format(ctx.parsed.y) }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 5000,
+                            callback: (value) => 'Rs. ' + value.toLocaleString(),
+                            font: { size: 10 }
+                        }
+                    },
+                    x: { ticks: { font: { size: 10 } } }
+                }
+            }
+        });
+
+        // 4. Yearly Sales Chart
+        new Chart(document.getElementById('yearlySalesChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: ['2023', '2024', '2025', '2026'],
+                datasets: [{
+                    label: 'Yearly Revenue',
+                    data: [2100000, 2800000, 3600000, 4500000],
+                    borderColor: '#9b59b6',
+                    backgroundColor: 'rgba(155, 89, 182, 0.15)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: { label: (ctx) => lkrFormatter.format(ctx.parsed.y) }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: (value) => 'Rs. ' + value.toLocaleString(),
+                            font: { size: 10 }
+                        }
+                    },
+                    x: { ticks: { font: { size: 10 } } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,389 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POS System - Login & Register</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #121317;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            position: relative;
+            background-color: #1a1c23;
+            width: 850px;
+            max-width: 100%;
+            min-height: 520px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+        }
+
+        .form-container {
+            position: absolute;
+            top: 0;
+            height: 100%;
+            transition: all 0.6s ease-in-out;
+            padding: 40px 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Login Form */
+        .login-container {
+            left: 0;
+            width: 50%;
+            z-index: 2;
+        }
+
+        /* Register Form */
+        .register-container {
+            left: 0;
+            width: 50%;
+            opacity: 0;
+            z-index: 1;
+        }
+
+        .container.active .login-container {
+            transform: translateX(100%);
+            opacity: 0;
+        }
+
+        .container.active .register-container {
+            transform: translateX(100%);
+            opacity: 1;
+            z-index: 5;
+            animation: move 0.6s;
+        }
+
+        @keyframes move {
+            0%, 49.99% {
+                opacity: 0;
+                z-index: 1;
+            }
+            50%, 100% {
+                opacity: 1;
+                z-index: 5;
+            }
+        }
+
+        h2 {
+            font-size: 26px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            color: #a0a5b5;
+            margin-bottom: 6px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 10px 14px;
+            background-color: #242731;
+            border: 1px solid #323644;
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .input-group input:focus {
+            border-color: #ff7d32;
+        }
+
+        .options-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            margin-bottom: 15px;
+            color: #a0a5b5;
+        }
+
+        .options-row label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+        }
+
+        .options-row a {
+            color: #ff7d32;
+            text-decoration: none;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(90deg, #ff7d32, #4a0000);
+            border: none;
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-submit:hover {
+            background: linear-gradient(90deg, #ff9655, #660000);
+        }
+
+        .divider {
+            text-align: center;
+            margin: 15px 0;
+            font-size: 11px;
+            color: #6c727f;
+        }
+
+        .social-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-social {
+            flex: 1;
+            padding: 9px;
+            background-color: #242731;
+            border: 1px solid #323644;
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-social:hover {
+            background-color: #2d313e;
+        }
+
+        /* Sliding Overlay Container */
+        .toggle-container {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 50%;
+            height: 100%;
+            overflow: hidden;
+            transition: all 0.6s ease-in-out;
+            border-radius: 150px 0 0 100px;
+            z-index: 1000;
+        }
+
+        .container.active .toggle-container {
+            transform: translateX(-100%);
+            border-radius: 0 150px 100px 0;
+        }
+
+        /* Gradient එක ලා තැඹිලි සහ තද රතු ලෙස වෙනස් කර ඇත */
+        .toggle {
+            background: linear-gradient(135deg, #ff7d32 0%, #4a0000 100%);
+            height: 100%;
+            color: #ffffff;
+            position: relative;
+            left: -100%;
+            width: 200%;
+            transform: translateX(0);
+            transition: all 0.6s ease-in-out;
+        }
+
+        .container.active .toggle {
+            transform: translateX(50%);
+        }
+
+        .toggle-panel {
+            position: absolute;
+            width: 50%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 0 40px;
+            text-align: center;
+            top: 0;
+            transform: translateX(0);
+            transition: all 0.6s ease-in-out;
+        }
+
+        .toggle-left {
+            transform: translateX(-200%);
+        }
+
+        .container.active .toggle-left {
+            transform: translateX(0);
+        }
+
+        .toggle-right {
+            right: 0;
+            transform: translateX(0);
+        }
+
+        .container.active .toggle-right {
+            transform: translateX(200%);
+        }
+
+        .toggle-panel h1 {
+            font-size: 30px;
+            margin-bottom: 10px;
+        }
+
+        .toggle-panel p {
+            font-size: 13px;
+            color: #fceae6;
+            margin-bottom: 20px;
+        }
+
+        .btn-outline {
+            border: 2px solid #ffffff;
+            background: transparent;
+            color: #ffffff;
+            padding: 10px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: 0.3s;
+        }
+
+        .btn-outline:hover {
+            background: #ffffff;
+            color: #4a0000;
+        }
+
+        /* Developed by කොටස සඳහා CSS */
+        .developer-tag {
+            position: absolute;
+            bottom: 20px;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 400;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="container">
+        <!-- Sign Up (Register) Form -->
+        <div class="form-container register-container">
+            <h2>Create Account</h2>
+            <form action="#">
+                <div class="input-group">
+                    <label>Username</label>
+                    <input type="text" placeholder="Enter username" required>
+                </div>
+                <div class="input-group">
+                    <label>Email Address</label>
+                    <input type="email" placeholder="Enter email" required>
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" placeholder="Create password" required>
+                </div>
+                <button type="submit" class="btn-submit">Sign Up</button>
+                <div class="divider">or sign up with</div>
+                <div class="social-buttons">
+                    <button type="button" class="btn-social">
+                        <i class="fab fa-google" style="color: #ea4335;"></i> Google
+                    </button>
+                    <button type="button" class="btn-social">
+                        <i class="fab fa-apple"></i> Apple
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Sign In (Login) Form -->
+        <div class="form-container login-container">
+            <h2>Login</h2>
+            <form action="#">
+                <div class="input-group">
+                    <label>Username</label>
+                    <input type="text" placeholder="Enter your username" required>
+                </div>
+                <div class="input-group">
+                    <label>Password</label>
+                    <input type="password" placeholder="Enter your password" required>
+                </div>
+                <div class="options-row">
+                    <label><input type="checkbox"> Remember me</label>
+                    <a href="#">Forgot password?</a>
+                </div>
+                <button type="submit" class="btn-submit">Sign In</button>
+                <div class="divider">or login with social platforms</div>
+                <div class="social-buttons">
+                    <button type="button" class="btn-social">
+                        <i class="fab fa-google" style="color: #ea4335;"></i> Google
+                    </button>
+                    <button type="button" class="btn-social">
+                        <i class="fab fa-apple"></i> Apple
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Sliding Panel Container -->
+        <div class="toggle-container">
+            <div class="toggle">
+                <div class="toggle-panel toggle-left">
+                    <h1>Welcome Back!</h1>
+                    <p>Enter your details to use all of system features</p>
+                    <button class="btn-outline" id="login">Sign In</button>
+                    <div class="developer-tag">Developed by 2m4k</div>
+                </div>
+                <div class="toggle-panel toggle-right">
+                    <h1>Hello, Welcome</h1>
+                    <p>Don't have an account?</p>
+                    <button class="btn-outline" id="register">Register</button>
+                    <div class="developer-tag">Developed by to  m4k</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const container = document.getElementById('container');
+        const registerBtn = document.getElementById('register');
+        const loginBtn = document.getElementById('login');
+
+        registerBtn.addEventListener('click', () => {
+            container.classList.add("active");
+        });
+
+        loginBtn.addEventListener('click', () => {
+            container.classList.remove("active");
+        });
+    </script>
+
+</body>
+</html>
