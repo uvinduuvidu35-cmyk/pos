@@ -185,7 +185,6 @@
             background-color: #2d313e;
         }
 
-        /* Error Message Style */
         .error-msg {
             color: #ff4d4d;
             font-size: 12px;
@@ -302,18 +301,18 @@
         <!-- Sign Up (Register) Form -->
         <div class="form-container register-container">
             <h2>Create Account</h2>
-            <form action="#">
+            <form id="registerForm">
                 <div class="input-group">
                     <label>Username</label>
-                    <input type="text" placeholder="Enter username" required>
+                    <input type="text" id="registerUsername" placeholder="Enter username" required>
                 </div>
                 <div class="input-group">
                     <label>Email Address</label>
-                    <input type="email" placeholder="Enter email" required>
+                    <input type="email" id="registerEmail" placeholder="Enter email" required>
                 </div>
                 <div class="input-group">
                     <label>Password</label>
-                    <input type="password" placeholder="Create password" required>
+                    <input type="password" id="registerPassword" placeholder="Create password" required>
                 </div>
                 <button type="submit" class="btn-submit">Sign Up</button>
                 <div class="divider">or sign up with</div>
@@ -333,8 +332,8 @@
             <h2>Login</h2>
             <form id="loginForm">
                 <div class="input-group">
-                    <label>Username</label>
-                    <input type="text" id="loginUsername" placeholder="Enter your username" required>
+                    <label>Email / Username</label>
+                    <input type="text" id="loginUsername" placeholder="Enter your email or username" required>
                 </div>
                 <div class="input-group">
                     <label>Password</label>
@@ -380,7 +379,13 @@
     <!-- Firebase SDK Scripts -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { 
+            getAuth, 
+            GoogleAuthProvider, 
+            signInWithPopup,
+            signInWithEmailAndPassword,
+            createUserWithEmailAndPassword 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
         // Your exact Firebase Configuration
         const firebaseConfig = {
@@ -398,13 +403,15 @@
         const auth = getAuth(app);
         const googleProvider = new GoogleAuthProvider();
 
-        // UI Event Listeners
+        // UI Elements
         const container = document.getElementById('container');
         const registerBtn = document.getElementById('register');
         const loginBtn = document.getElementById('login');
         const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
         const errorMsg = document.getElementById('errorMsg');
 
+        // Sliding Panel Event Listeners
         registerBtn.addEventListener('click', () => {
             container.classList.add("active");
         });
@@ -413,24 +420,45 @@
             container.classList.remove("active");
         });
 
-        // Username / Password Login Handling
+        // Login Handler (Supports Static Test Credentials + Firebase Auth)
         loginForm.addEventListener('submit', (e) => {
             e.preventDefault();
 
             const usernameInput = document.getElementById('loginUsername').value;
             const passwordInput = document.getElementById('loginPassword').value;
 
-            const validUsername = "admin";
-            const validPassword = "123";
-
-            if (usernameInput === validUsername && passwordInput === validPassword) {
+            // Test credentials
+            if (usernameInput === "admin" && passwordInput === "123") {
                 window.location.href = "dck dassh.html";
             } else {
-                errorMsg.innerText = "Invalid Username or Password!";
+                signInWithEmailAndPassword(auth, usernameInput, passwordInput)
+                    .then((userCredential) => {
+                        window.location.href = "dck dassh.html";
+                    })
+                    .catch((error) => {
+                        errorMsg.innerText = "Login Failed: " + error.message;
+                    });
             }
         });
 
-        // Google Login Handling
+        // Register Form Handler
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+
+            createUserWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    alert("Account Created Successfully!");
+                    window.location.href = "dck dassh.html";
+                })
+                .catch((error) => {
+                    alert("Registration Error: " + error.message);
+                });
+        });
+
+        // Google Sign-In Handler
         const googleButtons = document.querySelectorAll('.google-btn');
         googleButtons.forEach(button => {
             button.addEventListener('click', () => {
