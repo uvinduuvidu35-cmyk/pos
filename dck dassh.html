@@ -196,7 +196,6 @@
         }
 
         .badge-success { background: #e8f8f0; color: #2ecc71; }
-        .badge-pending { background: #fef9e7; color: #f1c40f; }
 
         /* Quick Action Buttons */
         .quick-actions {
@@ -226,6 +225,12 @@
             border-color: #ff7d32;
         }
 
+        .no-data {
+            text-align: center;
+            color: #999;
+            padding: 20px;
+        }
+
         @media (max-width: 900px) {
             .content-grid {
                 grid-template-columns: 1fr;
@@ -235,7 +240,7 @@
 </head>
 <body>
 
-    <!-- Sidebar with Full Menu -->
+    <!-- Sidebar -->
     <div class="sidebar">
         <h2>DCK POS</h2>
         <ul>
@@ -254,24 +259,23 @@
         </ul>
     </div>
 
-    <!-- Main Dashboard Section -->
+    <!-- Main Content -->
     <div class="dashboard-container">
         
-        <!-- Top Bar -->
         <div class="dashboard-header">
             <h1>Overview Dashboard</h1>
             <div class="user-profile">
                 <i class="fa-solid fa-circle-user"></i>
-                <span id="user-display-name">Admin Cashier</span>
+                <span id="user-display-name">Loading...</span>
             </div>
         </div>
 
-        <!-- Stat Cards Grid -->
+        <!-- Realtime Stats -->
         <div class="stats-grid">
             <div class="stat-card">
                 <div class="info">
                     <h3>Today's Sales</h3>
-                    <p id="total-sales">LKR 45,250.00</p>
+                    <p id="total-sales">LKR 0.00</p>
                 </div>
                 <div class="icon-box">
                     <i class="fa-solid fa-sack-dollar"></i>
@@ -281,7 +285,7 @@
             <div class="stat-card">
                 <div class="info">
                     <h3>Total Orders</h3>
-                    <p id="total-orders">38</p>
+                    <p id="total-orders">0</p>
                 </div>
                 <div class="icon-box">
                     <i class="fa-solid fa-receipt"></i>
@@ -291,7 +295,7 @@
             <div class="stat-card">
                 <div class="info">
                     <h3>Low Stock Items</h3>
-                    <p id="low-stock">5</p>
+                    <p id="low-stock">0</p>
                 </div>
                 <div class="icon-box" style="color: #e74c3c; background: #fdeae8;">
                     <i class="fa-solid fa-triangle-exclamation"></i>
@@ -301,7 +305,7 @@
             <div class="stat-card">
                 <div class="info">
                     <h3>Active Shift</h3>
-                    <p id="shift-status">Open</p>
+                    <p id="shift-status">None</p>
                 </div>
                 <div class="icon-box" style="color: #2ecc71; background: #e8f8f0;">
                     <i class="fa-solid fa-clock"></i>
@@ -309,9 +313,7 @@
             </div>
         </div>
 
-        <!-- Lower Section (Recent Sales & Shortcuts) -->
         <div class="content-grid">
-            <!-- Recent Transactions Table -->
             <div class="card-box">
                 <h3><i class="fa-solid fa-list"></i> Recent Transactions</h3>
                 <table class="recent-table">
@@ -324,12 +326,11 @@
                         </tr>
                     </thead>
                     <tbody id="recent-transactions">
-                        <!-- Dynamic content loaded via JS -->
+                        <tr><td colspan="4" class="no-data">No transactions found</td></tr>
                     </tbody>
                 </table>
             </div>
 
-            <!-- Quick Shortcuts -->
             <div class="card-box">
                 <h3><i class="fa-solid fa-bolt"></i> Quick Actions</h3>
                 <div class="quick-actions">
@@ -348,13 +349,12 @@
 
     </div>
 
-    <!-- Firebase SDK Scripts (CDN) -->
+    <!-- Firebase Script -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, query, where, onSnapshot, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyC3xvmy4iXZ7B0ZbVjP2-ZoFuDcacg71F4",
             authDomain: "dck-29351.firebaseapp.com",
@@ -365,50 +365,70 @@
             measurementId: "G-6YETC20HD3"
         };
 
-        // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Check Auth State
+        // Check Auth
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 document.getElementById('user-display-name').innerText = user.displayName || user.email;
+                listenToRealtimeData();
             } else {
-                // Redirect to login if not logged in
                 window.location.href = "index.html"; 
             }
         });
 
-        // Sample Dashboard Data Simulation
-        const recentOrders = [
-            { id: '#INV-1024', time: '10:42 AM', total: 'LKR 2,620.00', status: 'Completed' },
-            { id: '#INV-1023', time: '10:15 AM', total: 'LKR 1,150.00', status: 'Completed' },
-            { id: '#INV-1022', time: '09:50 AM', total: 'LKR 4,500.00', status: 'Completed' },
-            { id: '#INV-1021', time: '09:12 AM', total: 'LKR 870.00', status: 'Completed' }
-        ];
+        // Listen to Realtime Firestore Updates
+        function listenToRealtimeData() {
+            // 1. Realtime Sales & Orders Listener
+            const ordersRef = collection(db, "orders");
+            onSnapshot(ordersRef, (snapshot) => {
+                let salesSum = 0;
+                let count = snapshot.size;
+                const tbody = document.getElementById('recent-transactions');
+                
+                if (count === 0) {
+                    tbody.innerHTML = `<tr><td colspan="4" class="no-data">No transactions found</td></tr>`;
+                } else {
+                    tbody.innerHTML = '';
+                }
 
-        // Render Recent Transactions
-        function loadDashboardData() {
-            const tbody = document.getElementById('recent-transactions');
-            tbody.innerHTML = '';
+                snapshot.docs.forEach((doc) => {
+                    const data = doc.data();
+                    salesSum += (Number(data.totalAmount) || 0);
 
-            recentOrders.forEach(order => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td><strong>${order.id}</strong></td>
-                        <td>${order.time}</td>
-                        <td>${order.total}</td>
-                        <td><span class="badge badge-success">${order.status}</span></td>
-                    </tr>
-                `;
+                    // Add to recent table (Top 5)
+                    if (tbody.children.length < 5 && count > 0) {
+                        tbody.innerHTML += `
+                            <tr>
+                                <td><strong>${data.invoiceNo || '#' + doc.id.substring(0, 6)}</strong></td>
+                                <td>${data.time || 'N/A'}</td>
+                                <td>LKR ${(Number(data.totalAmount) || 0).toFixed(2)}</td>
+                                <td><span class="badge badge-success">${data.status || 'Completed'}</span></td>
+                            </tr>
+                        `;
+                    }
+                });
+
+                document.getElementById('total-sales').innerText = `LKR ${salesSum.toFixed(2)}`;
+                document.getElementById('total-orders').innerText = count;
+            });
+
+            // 2. Realtime Low Stock Items Listener (Qty < 5)
+            const itemsRef = collection(db, "items");
+            const lowStockQuery = query(itemsRef, where("quantity", "<=", 5));
+            onSnapshot(lowStockQuery, (snapshot) => {
+                document.getElementById('low-stock').innerText = snapshot.size;
+            });
+
+            // 3. Active Shift Listener
+            const shiftsRef = collection(db, "shifts");
+            const activeShiftQuery = query(shiftsRef, where("status", "==", "open"));
+            onSnapshot(activeShiftQuery, (snapshot) => {
+                document.getElementById('shift-status').innerText = snapshot.empty ? "Closed" : "Open";
             });
         }
-
-        // Initialize Data
-        document.addEventListener('DOMContentLoaded', () => {
-            loadDashboardData();
-        });
     </script>
 </body>
 </html>
