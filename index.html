@@ -318,7 +318,7 @@
                 <button type="submit" class="btn-submit">Sign Up</button>
                 <div class="divider">or sign up with</div>
                 <div class="social-buttons">
-                    <button type="button" class="btn-social">
+                    <button type="button" class="btn-social google-btn">
                         <i class="fab fa-google" style="color: #ea4335;"></i> Google
                     </button>
                     <button type="button" class="btn-social">
@@ -348,7 +348,7 @@
                 <p id="errorMsg" class="error-msg"></p>
                 <div class="divider">or login with social platforms</div>
                 <div class="social-buttons">
-                    <button type="button" class="btn-social">
+                    <button type="button" class="btn-social google-btn">
                         <i class="fab fa-google" style="color: #ea4335;"></i> Google
                     </button>
                     <button type="button" class="btn-social">
@@ -377,11 +377,33 @@
         </div>
     </div>
 
-    <script>
+    <!-- Firebase SDK Scripts -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        // Your exact Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC3xvmy4iXZ7B0ZbVjP2-ZoFuDcacg71F4",
+            authDomain: "dck-29351.firebaseapp.com",
+            projectId: "dck-29351",
+            storageBucket: "dck-29351.firebasestorage.app",
+            messagingSenderId: "577984877543",
+            appId: "1:577984877543:web:91f6a221eb4f7c85a2e342",
+            measurementId: "G-6YETC20HD3"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const googleProvider = new GoogleAuthProvider();
+
+        // UI Event Listeners
         const container = document.getElementById('container');
         const registerBtn = document.getElementById('register');
         const loginBtn = document.getElementById('login');
         const loginForm = document.getElementById('loginForm');
+        const errorMsg = document.getElementById('errorMsg');
 
         registerBtn.addEventListener('click', () => {
             container.classList.add("active");
@@ -391,15 +413,13 @@
             container.classList.remove("active");
         });
 
-        // Login Submit Handling
+        // Username / Password Login Handling
         loginForm.addEventListener('submit', (e) => {
             e.preventDefault();
 
             const usernameInput = document.getElementById('loginUsername').value;
             const passwordInput = document.getElementById('loginPassword').value;
-            const errorMsg = document.getElementById('errorMsg');
 
-            // Set your default Username and Password here
             const validUsername = "admin";
             const validPassword = "123";
 
@@ -408,6 +428,22 @@
             } else {
                 errorMsg.innerText = "Invalid Username or Password!";
             }
+        });
+
+        // Google Login Handling
+        const googleButtons = document.querySelectorAll('.google-btn');
+        googleButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                signInWithPopup(auth, googleProvider)
+                    .then((result) => {
+                        console.log("Logged in User:", result.user);
+                        window.location.href = "dck dassh.html";
+                    })
+                    .catch((error) => {
+                        console.error("Google Auth Error:", error);
+                        errorMsg.innerText = "Google Sign-In Failed! " + error.message;
+                    });
+            });
         });
     </script>
 
