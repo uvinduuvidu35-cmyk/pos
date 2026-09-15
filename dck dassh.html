@@ -266,7 +266,7 @@
             <h1>Overview Dashboard</h1>
             <div class="user-profile">
                 <i class="fa-solid fa-circle-user"></i>
-                <span id="user-display-name">Loading...</span>
+                <span id="user-display-name">Guest User</span>
             </div>
         </div>
 
@@ -353,7 +353,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, query, where, onSnapshot, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, query, where, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC3xvmy4iXZ7B0ZbVjP2-ZoFuDcacg71F4",
@@ -369,17 +369,18 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Check Auth
+        // Check Auth without redirection
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 document.getElementById('user-display-name').innerText = user.displayName || user.email;
-                listenToRealtimeData();
             } else {
-                window.location.href = "index.html"; 
+                document.getElementById('user-display-name').innerText = "Guest User";
             }
         });
 
-        // Listen to Realtime Firestore Updates
+        // Immediately start listening to Realtime Firestore Updates
+        listenToRealtimeData();
+
         function listenToRealtimeData() {
             // 1. Realtime Sales & Orders Listener
             const ordersRef = collection(db, "orders");
@@ -415,7 +416,7 @@
                 document.getElementById('total-orders').innerText = count;
             });
 
-            // 2. Realtime Low Stock Items Listener (Qty < 5)
+            // 2. Realtime Low Stock Items Listener (Qty <= 5)
             const itemsRef = collection(db, "items");
             const lowStockQuery = query(itemsRef, where("quantity", "<=", 5));
             onSnapshot(lowStockQuery, (snapshot) => {
