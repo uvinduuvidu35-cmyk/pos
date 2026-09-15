@@ -337,7 +337,7 @@
                         <i class="fa-solid fa-cart-plus"></i> Open POS Terminal
                     </a>
                     <a href="items.html" class="action-btn">
-                        <i class="fa-solid fa-plus-node"></i> Add New Product
+                        <i class="fa-solid fa-plus"></i> Add New Product
                     </a>
                     <a href="reports.html" class="action-btn">
                         <i class="fa-solid fa-chart-line"></i> View Daily Report
@@ -352,16 +352,17 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // Your Firebase Configuration
+        // Firebase Configuration
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
+            apiKey: "AIzaSyC3xvmy4iXZ7B0ZbVjP2-ZoFuDcacg71F4",
+            authDomain: "dck-29351.firebaseapp.com",
+            projectId: "dck-29351",
+            storageBucket: "dck-29351.firebasestorage.app",
+            messagingSenderId: "577984877543",
+            appId: "1:577984877543:web:91f6a221eb4f7c85a2e342",
+            measurementId: "G-6YETC20HD3"
         };
 
         // Initialize Firebase
@@ -375,7 +376,7 @@
                 document.getElementById('user-display-name').innerText = user.displayName || user.email;
             } else {
                 // Redirect to login if not logged in
-                // window.location.href = "login.html";
+                window.location.href = "index.html"; 
             }
         });
 
