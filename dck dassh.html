@@ -3,321 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DCK POS - Charts & Analytics</title>
-    <!-- FontAwesome Icons -->
+    <title>DCK POS - Login</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <!-- Chart.js Library -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', Arial, sans-serif;
-        }
-
-        body { 
-            display: flex; 
-            background-color: #f4f6f9; 
-            color: #333;
-        }
-
-        /* Sidebar Styling */
-        .sidebar { 
-            width: 260px; 
-            background-color: #1a1c23; 
-            color: white; 
-            height: 100vh; 
-            padding: 20px 15px; 
-            position: fixed; 
-            overflow-y: auto;
-        }
-
-        .sidebar h2 { 
-            text-align: center; 
-            color: #ffffff; 
-            margin-bottom: 30px; 
-            font-size: 22px;
-            letter-spacing: 1px;
-        }
-
-        .sidebar ul { 
-            list-style: none; 
-            padding: 0; 
-        }
-
-        .sidebar li { 
-            margin: 8px 0; 
-        }
-
-        .sidebar a { 
-            color: #a0a5b5; 
-            text-decoration: none; 
-            display: flex; 
-            align-items: center; 
-            gap: 12px;
-            padding: 12px 15px; 
-            border-radius: 8px; 
-            font-size: 14px;
-            transition: all 0.3s ease; 
-        }
-
-        .sidebar a i {
-            font-size: 16px;
-            width: 20px;
-            text-align: center;
-        }
-
-        .sidebar a:hover, .sidebar a.active { 
-            background: linear-gradient(90deg, #ff7d32, #4a0000); 
-            color: white; 
-        }
-
-        /* Main Content */
-        .main-content { 
-            margin-left: 260px; 
-            padding: 25px; 
-            width: calc(100% - 260px); 
-        }
-
-        header { 
-            background-color: white; 
-            padding: 15px 25px; 
-            border-radius: 12px; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05); 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            margin-bottom: 25px;
-        }
-
-        header h1 {
-            font-size: 24px;
-            color: #1a1c23;
-        }
-
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 500;
-        }
-
-        .user-profile i {
-            font-size: 20px;
-            color: #ff7d32;
-        }
-
-        /* Charts Grid Section */
-        .charts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 20px;
-        }
-
-        .chart-card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .chart-card h3 {
-            font-size: 16px;
-            color: #1a1c23;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            width: 100%;
-        }
-
-        .chart-container {
-            position: relative;
-            width: 100%;
-            height: 220px;
-        }
-
-        canvas {
-            width: 100% !important;
-            height: 100% !important;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        body { background-color: #1a1c23; height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .login-card { background: white; width: 100%; max-width: 400px; padding: 40px 30px; border-radius: 12px; text-align: center; box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+        .login-card h2 { color: #1a1c23; margin-bottom: 8px; font-size: 26px; }
+        .login-card p { color: #777; margin-bottom: 30px; font-size: 14px; }
+        .btn-google { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; background: white; font-size: 15px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s; }
+        .btn-google:hover { background: #f4f4f4; }
+        .error-msg { color: #e74c3c; font-size: 13px; margin-top: 15px; display: none; }
     </style>
 </head>
 <body>
 
-    <!-- Sidebar -->
-    <div class="sidebar">
+    <div class="login-card">
         <h2>DCK POS</h2>
-        <ul>
-            <li><a href="dash.html"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
-            <li><a href="pos.html"><i class="fa-solid fa-cart-shopping"></i> POS</a></li>
-            <li><a href="items.html"><i class="fa-solid fa-boxes-stacked"></i> Items</a></li>
-            <li><a href="customers.html"><i class="fa-solid fa-users"></i> Customers</a></li>
-            <li><a href="#"><i class="fa-solid fa-clock-rotate-left"></i> Shifts</a></li>
-            <li><a href="#"><i class="fa-solid fa-wallet"></i> Expenses</a></li>
-            <li><a href="#"><i class="fa-solid fa-money-bill-transfer"></i> Cash Drops</a></li>
-            <li><a href="#"><i class="fa-solid fa-cubes"></i> Stock</a></li>
-            <li><a href="#"><i class="fa-solid fa-sliders"></i> Adjustments</a></li>
-            <li><a href="#"><i class="fa-solid fa-arrow-right-arrow-left"></i> Transfers</a></li>
-            <li><a href="#"><i class="fa-solid fa-file-invoice"></i> Reports</a></li>
-            <li><a href="charts.html" class="active"><i class="fa-solid fa-chart-pie"></i> Charts</a></li>
-        </ul>
+        <p>Sign in to access your POS System</p>
+        <button class="btn-google" id="btn-google-login">
+            <i class="fa-brands fa-google" style="color: #4285F4;"></i> Sign in with Google
+        </button>
+        <div id="error-message" class="error-msg"></div>
     </div>
 
-    <!-- Main Content -->
-    <div class="main-content">
-        <header>
-            <h1>Analytics & Charts</h1>
-            <div class="user-profile">
-                <i class="fa-solid fa-circle-user"></i> User: Admin
-            </div>
-        </header>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+        import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js";
 
-        <!-- Charts Grid Layout (4 Compact Charts) -->
-        <div class="charts-grid">
-            <!-- Pie Chart: Stock by Category -->
-            <div class="chart-card">
-                <h3><i class="fa-solid fa-chart-pie" style="color: #ff7d32;"></i> Stock Category Breakdown</h3>
-                <div class="chart-container">
-                    <canvas id="shoeCategoryChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Line Chart: Daily Sales -->
-            <div class="chart-card">
-                <h3><i class="fa-solid fa-chart-line" style="color: #3498db;"></i> Daily Sales (LKR)</h3>
-                <div class="chart-container">
-                    <canvas id="dailySalesChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Line Chart: Monthly Sales -->
-            <div class="chart-card">
-                <h3><i class="fa-solid fa-chart-simple" style="color: #2ecc71;"></i> Monthly Sales (LKR)</h3>
-                <div class="chart-container">
-                    <canvas id="monthlySalesChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Line Chart: Yearly Sales -->
-            <div class="chart-card">
-                <h3><i class="fa-solid fa-arrow-trend-up" style="color: #9b59b6;"></i> Yearly Sales (LKR)</h3>
-                <div class="chart-container">
-                    <canvas id="yearlySalesChart"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // LKR Currency Formatter for Tooltips
-        const lkrFormatter = new Intl.NumberFormat('en-LK', {
-            style: 'currency',
-            currency: 'LKR',
-        });
-
-        const lineChartOptions = {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return lkrFormatter.format(context.parsed.y);
-                        }
-                    }
-                }
-            },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return 'Rs. ' + value.toLocaleString();
-                        },
-                        font: { size: 10 }
-                    }
-                },
-                x: {
-                    ticks: { font: { size: 10 } }
-                }
-            }
+        const firebaseConfig = {
+            apiKey: "AIzaSyC3xvmy4iXZ7B0ZbVjP2-ZoFuDcacg71F4",
+            authDomain: "dck-29351.firebaseapp.com",
+            projectId: "dck-29351",
+            storageBucket: "dck-29351.firebasestorage.app",
+            messagingSenderId: "577984877543",
+            appId: "1:577984877543:web:91f6a221eb4f7c85a2e342",
+            measurementId: "G-6YETC20HD3"
         };
 
-        // 1. Pie Chart: Shoe Categories (Values Set to 0)
-        new Chart(document.getElementById('shoeCategoryChart').getContext('2d'), {
-            type: 'pie',
-            data: {
-                labels: ['Gents', 'Ladies', 'Girls', 'Boys', 'Kids'],
-                datasets: [{
-                    data: [0, 0, 0, 0, 0],
-                    backgroundColor: ['#1a1c23', '#e84393', '#ff7d32', '#3498db', '#2ecc71'],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: { boxWidth: 12, font: { size: 11 } }
-                    }
-                }
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const provider = new GoogleAuthProvider();
+
+        // 🔒 Access ලබාදෙන Google Email ලිස්ට් එක මෙතනට දාන්න
+        // ලිස්ට් එක හිස් නම් ([]) ඕනෑම Google Account එකකට Login විය හැක.
+        const allowedEmails = [
+            // "yourname@gmail.com"
+        ];
+
+        // කවුරුහරි දැනටමත් Log වෙලා ඉන්නවා නම් Direct Dashboard එකට යැවීම
+        onAuthStateChanged(auth, (user) => {
+            if (user && (allowedEmails.length === 0 || allowedEmails.includes(user.email))) {
+                window.location.href = "dashboard.html";
             }
         });
 
-        // 2. Daily Sales Chart (Values Set to 0)
-        new Chart(document.getElementById('dailySalesChart').getContext('2d'), {
-            type: 'line',
-            data: {
-                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                datasets: [{
-                    data: [0, 0, 0, 0, 0, 0, 0],
-                    borderColor: '#3498db',
-                    backgroundColor: 'rgba(52, 152, 219, 0.1)',
-                    fill: true,
-                    tension: 0.3
-                }]
-            },
-            options: lineChartOptions
-        });
-
-        // 3. Monthly Sales Chart (Values Set to 0)
-        new Chart(document.getElementById('monthlySalesChart').getContext('2d'), {
-            type: 'line',
-            data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-                datasets: [{
-                    data: [0, 0, 0, 0, 0, 0],
-                    borderColor: '#2ecc71',
-                    backgroundColor: 'rgba(46, 204, 113, 0.1)',
-                    fill: true,
-                    tension: 0.3
-                }]
-            },
-            options: lineChartOptions
-        });
-
-        // 4. Yearly Sales Chart (Values Set to 0)
-        new Chart(document.getElementById('yearlySalesChart').getContext('2d'), {
-            type: 'line',
-            data: {
-                labels: ['2023', '2024', '2025', '2026'],
-                datasets: [{
-                    data: [0, 0, 0, 0],
-                    borderColor: '#9b59b6',
-                    backgroundColor: 'rgba(155, 89, 182, 0.1)',
-                    fill: true,
-                    tension: 0.3
-                }]
-            },
-            options: lineChartOptions
+        document.getElementById('btn-google-login').addEventListener('click', () => {
+            signInWithPopup(auth, provider)
+                .then((result) => {
+                    const user = result.user;
+                    if (allowedEmails.length > 0 && !allowedEmails.includes(user.email)) {
+                        document.getElementById('error-message').innerText = "Access Denied: Your email is not authorized.";
+                        document.getElementById('error-message').style.display = "block";
+                        auth.signOut();
+                    } else {
+                        window.location.href = "dashboard.html";
+                    }
+                })
+                .catch((error) => {
+                    console.error(error);
+                    document.getElementById('error-message').innerText = "Login Failed! Try again.";
+                    document.getElementById('error-message').style.display = "block";
+                });
         });
     </script>
 </body>
